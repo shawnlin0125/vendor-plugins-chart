@@ -3,11 +3,7 @@
 
 namespace: vendor-staging
 
-# scan-plugins.sh fills this list automatically
-plugins: []
+plugins:
 
 registry:
   server: ghcr.io
-  imagePullSecrets:
-    - name: image-registry
-  # Images are pushed as ghcr.io/shawnlin0125/vendor-plugin-<name>:<tag>
