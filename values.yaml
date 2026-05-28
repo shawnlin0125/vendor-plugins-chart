@@ -4,6 +4,10 @@
 namespace: vendor-staging
 
 plugins:
+  - name: demo
+    image: ghcr.io/shawnlin0125/vendor-plugin-demo
+    tag: latest
+    port: 8080
 
 registry:
   server: ghcr.io
