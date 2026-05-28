@@ -11,3 +11,10 @@ plugins:
 
 registry:
   server: ghcr.io
+  imagePullSecrets:
+    - name: image-registry
+
+# Ingress config — override in values-staging.yaml
+ingress:
+  enabled: false
+  host: vendor-demo.shawnlin.online
