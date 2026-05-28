@@ -1,6 +1,10 @@
 # Staging-specific overrides
 namespace: vendor-staging
 
+ingress:
+  enabled: true
+  host: vendor-demo.shawnlin.online
+
 env:
   - name: DB_URL
     valueFrom:

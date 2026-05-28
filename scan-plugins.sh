@@ -44,6 +44,13 @@ cat >> values.yaml << 'FOOTER'
 
 registry:
   server: ghcr.io
+  imagePullSecrets:
+    - name: image-registry
+
+# Ingress config — override in values-staging.yaml
+ingress:
+  enabled: false
+  host: vendor-demo.shawnlin.online
 FOOTER
 
 echo "values.yaml updated with $(echo $PLUGINS | wc -w | tr -d ' ') plugins."
