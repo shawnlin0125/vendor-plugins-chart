@@ -1,11 +1,13 @@
 name: scan-and-sync
 
 on:
-  workflow_dispatch:        # Manual trigger
+  workflow_dispatch:          # Manual trigger
+  push:
+    branches: [main]          # Also run on push (for manual values.yaml edits)
   schedule:
-    - cron: '*/30 * * * *'  # Every 30 min as fallback
+    - cron: '*/15 * * * *'    # Every 15 min as fallback
   repository_dispatch:
-    types: [plugin-created]  # Triggered by init-plugin.sh
+    types: [plugin-created]    # Triggered by init-plugin.sh
 
 jobs:
   scan:
