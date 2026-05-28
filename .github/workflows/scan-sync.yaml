@@ -1,0 +1,28 @@
+name: scan-and-sync
+
+on:
+  workflow_dispatch:        # Manual trigger
+  schedule:
+    - cron: '*/30 * * * *'  # Every 30 min as fallback
+  repository_dispatch:
+    types: [plugin-created]  # Triggered by init-plugin.sh
+
+jobs:
+  scan:
+    name: Scan plugins & update values.yaml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Install GitHub CLI
+        run: |
+          type gh || (sudo apt-get update && sudo apt-get install -y gh)
+
+      - name: Scan plugins
+        run: |
+          chmod +x scan-plugins.sh
+          ./scan-plugins.sh
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}

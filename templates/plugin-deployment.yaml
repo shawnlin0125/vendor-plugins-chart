@@ -1,0 +1,81 @@
+{{- range .Values.plugins }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vendor-plugins.fullname" . }}
+  namespace: {{ $.Values.namespace }}
+  labels:
+    {{- include "vendor-plugins.labels" $ | nindent 4 }}
+    app: {{ include "vendor-plugins.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "vendor-plugins.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "vendor-plugins.fullname" . }}
+    spec:
+      {{- if $.Values.registry.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml $.Values.registry.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: plugin
+          image: {{ .image }}:{{ .tag | default "latest" }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: {{ .port | default 8080 }}
+              protocol: TCP
+          env:
+            - name: PLUGIN_NAME
+              value: {{ include "vendor-plugins.fullname" . }}
+            - name: PORT
+              value: {{ .port | default 8080 | quote }}
+            - name: DB_SCHEMA
+              value: {{ .name }}
+            - name: REDIS_PREFIX
+              value: "{{ .name }}:"
+            {{- if $.Values.env }}
+            {{- toYaml $.Values.env | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .port | default 8080 }}
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .port | default 8080 }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vendor-plugins.fullname" . }}
+  namespace: {{ $.Values.namespace }}
+  labels:
+    {{- include "vendor-plugins.labels" $ | nindent 4 }}
+    app: {{ include "vendor-plugins.fullname" . }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ include "vendor-plugins.fullname" . }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: {{ .port | default 8080 }}
+{{- end }}
